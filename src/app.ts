@@ -1,16 +1,16 @@
-import { DB, Statuses, UrlRecord } from './db'
-import { HTTP } from './http'
+import { DbService, Statuses, UrlRecord } from './services/db.service'
+import { HttpService } from './services/http.service'
 
 export class App {
     constructor(
-        private readonly db: DB,
-        private readonly http: HTTP
+        private readonly dbService: DbService,
+        private readonly httpService: HttpService
     ) {}
 
     async run() {
-        await this.db.connect()
+        await this.dbService.connect()
 
-        const newUrls = await this.db.getAllNewUrls()
+        const newUrls = await this.dbService.getAllNewUrls()
 
         const promises = []
 
@@ -20,19 +20,19 @@ export class App {
 
         await Promise.all(promises)
 
-        await this.db.disconnect()
+        await this.dbService.disconnect()
     }
 
     private async processUrlRecord(record: UrlRecord) {
-        await this.db.updateUrlRecord({
+        await this.dbService.updateUrlRecord({
             id: record.id,
             url: record.url,
             status: Statuses.PROCESSING,
         })
 
-        const statusCode = await this.http.makeCall(record.url)
+        const statusCode = await this.httpService.makeCall(record.url)
 
-        await this.db.updateUrlRecord({
+        await this.dbService.updateUrlRecord({
             id: record.id,
             url: record.url,
             status: this.parseStatusCode(statusCode),

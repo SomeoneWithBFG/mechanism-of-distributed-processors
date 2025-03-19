@@ -14,7 +14,7 @@ export enum Statuses {
     ERROR = 'ERROR',
 }
 
-export class DB {
+export class DbService {
     constructor() {
         this.client = new Client({
             user: process.env.POSTGRES_USER,
@@ -26,10 +26,11 @@ export class DB {
         })
     }
     private client: Client
+    private urlTableName = 'urls'
 
     async getAllNewUrls() {
         const selectQuery = `
-            select * from urls
+            select * from ${this.urlTableName}
             where status='${Statuses.NEW}'
         `
 
@@ -40,7 +41,7 @@ export class DB {
 
     async updateUrlRecord(record: UrlRecord) {
         const updateQuery = `
-            update urls 
+            update ${this.urlTableName} 
             set status = $2, http_code = $3
             where id = $1
         `
@@ -91,7 +92,7 @@ export class DB {
             end $$;
 
             -- Create the table with the specified columns
-            create table if not exists urls (
+            create table if not exists ${this.urlTableName} (
                 id uuid default gen_random_uuid() primary key,
                 url varchar not null,
                 status status_enum not null,
@@ -101,7 +102,7 @@ export class DB {
         await this.runSql(migrationSql)
 
         const seedSql = `
-            insert into urls (url, status, http_code) values
+            insert into ${this.urlTableName} (url, status, http_code) values
                 -- status -> DONE
                 ('https://example.com', 'NEW', NULL),
                 ('https://google.com', 'NEW', NULL),
@@ -110,7 +111,7 @@ export class DB {
 
                 -- status -> ERROR
                 ('https://example.com/error', 'NEW', NULL),
-                ('http://localhost:5051/?pgsql=db&username=admin&db=db&ns=public&select=urls', 'NEW', NULL),
+                ('http://localhost:5051/?pgsql=db&username=admin&db=db&ns=public&select=${this.urlTableName}', 'NEW', NULL),
 
                 -- Ignored
                 ('https://example.com/ignored', 'DONE', 403),

@@ -1,11 +1,11 @@
 import 'dotenv/config'
-import { DB } from './db'
-import { HTTP } from './http'
+import { DbService } from './services/db.service'
+import { HttpService } from './services/http.service'
 import { App } from './app'
 
-const db = new DB()
-const http = new HTTP()
+const dbService = new DbService()
+const httpService = new HttpService()
 
-const app = new App(db, http)
+const app = new App(dbService, httpService)
 
 app.run()

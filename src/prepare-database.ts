@@ -1,7 +1,7 @@
-import { DB } from './db'
+import { DbService } from './services/db.service'
 import 'dotenv/config'
 
-const db = new DB()
+const db = new DbService()
 
 async function prepareDb() {
     await db.prepareDb()
