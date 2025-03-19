@@ -5,7 +5,7 @@
     "scripts": {
         "build": "npx tsc",
         "start": "node ./dist/main.js",
-        "prepare-db": "npx tsc & node ./dist/prepare-database.js",
+        "prepare-db": "node ./dist/prepare-database.js",
         "build-prepare-run": "npx tsc & node ./dist/prepare-database.js & node ./dist/main.js",
         "prettier": "prettier --write .",
         "prettier:check": "prettier --check .",
